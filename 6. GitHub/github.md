@@ -191,3 +191,26 @@ This command is used to save our working tree changes to a temporary area for th
    * __$ git stash__  [ Working tree would be clean after executing this command ]
 
    * __$ git stash apply__ : [All the preseved changes will come and we have to commit and push it according to our need]
+
+
+## Git merge vs Git rebase :
+
+merge and integrate both are used to integrate the changes from one branch to another branch but in a different way. __It is an alternative to Pull Requests__
+
+   * __git merge__ :
+
+      * It preserves the non linear history of the commits and the new commit is added. 
+
+      __NOTE :__ "merge" is very recommended whenever you are working on a branch on which multiple engineers are contributing it . 
+
+        * ![alt text](image-14.png)
+
+   * __git rebase__ :
+
+      * It preserves the linear history of the commits by __rewriting the commits__ and the new commit wont be added .
+
+        ![alt text](image-16.png)
+    
+      __NOTE:__  __NEVER-EVER run the rebase command from the main/master branch__ , It will messup the commit history of the developers that they already commited into the main/master branch .
+
+      __NOTE:__ Always use git rebase on a branch where you are working it and no-one else is contributing to it .
