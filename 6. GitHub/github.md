@@ -156,17 +156,7 @@ __Ex:__ In maven project,  We shouldn't push target folder to git repository hen
 
 ![alt text](image-7.png)
 
-## What are git conflicts ?
 
-![alt text](image-8.png)
-
-__Conflicts arise basically in two Scenarios :__
-
- * When we are taking the pull on some branch from the Central Repository at that time conflict can arise.
-
- * When we merge one branch to another branch , at that time also conflict can occur .
-
-__NOTE:__ We manually resolve the conflicts.
 
 __NOTE:__ If we want someone to do the code changes to our repository , we can make them as Collaborators 
 
