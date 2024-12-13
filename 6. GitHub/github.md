@@ -70,13 +70,18 @@
 
    > __NOTE :__ When we use the git push command for the first time in GitBash  , It will ask the password to enter , You can use the __Git token__ at that time . It is not recommended to use the __Git password__ , It is recommended to use the __Git Token__ instead of a password . 
 
-   > __NOTE :__ When we are pushing the changes to the Repository for the first time , We need to establish the connection between the Working tree and the Central Repository. __(Configure the Remote Repo URL)__
+   > __NOTE :__ When we are pushing the changes to the Repository for the first time , We need to establish the connection between the Working tree and the Central Repository. __(Configure the Remote Repo URL by executing the below three commands)__
+
+     * __$ git branch -M main__
 
      * __$ git remote add origin https://github.com/sunny-coder97/axis_app.git__
 
+     * __$ git push -u origin main__
      * ![alt text](image-3.png)
 
-     > Once the Connection is established , We can directly use __git push__  command
+     > Once the Connection is established , We can directly use __git push__  command.
+
+     > __NOTE :__ While using the __git push command__ , only those files will be pushed to the Central Repository , which are commited in the Local Repository.
 
      
 
@@ -155,7 +160,13 @@ __Ex:__ In maven project,  We shouldn't push target folder to git repository hen
 
 ![alt text](image-8.png)
 
+__Conflicts arise basically in two Scenarios :__
 
+ * When we are taking the pull on some branch from the Central Repository at that time conflict can arise.
+
+ * When we merge one branch to another branch , at that time also conflict can occur .
+
+__NOTE:__ We manually resolve the conflicts.
 
 __NOTE:__ If we want someone to do the code changes to our repository , we can make them as Collaborators 
 
@@ -193,15 +204,46 @@ This command is used to save our working tree changes to a temporary area for th
    * __$ git stash apply__ : [All the preseved changes will come and we have to commit and push it according to our need]
 
 
-## Git merge vs Git rebase :
+## Git Conflicts Issues:
 
-merge and integrate both are used to integrate the changes from one branch to another branch but in a different way. __It is an alternative to Pull Requests__
+* Conflicts usually occur when we merge one branch into another branch , even in the case of __git pull__ also we merge the branch of Remote Repo into our Local Repo . At that time conflict can occur.
+
+* There is no automatic way to resolve the conflicts , We always manually resolve the conflicts.
+
+* __If conflict comes while during the pull in a specific branch , we need to follow the below steps:__
+
+   * Resolve the conflicts manually .
+   
+   * After resolving the conflicts in the file , we need to stage the changes to mark the conflict as resolved by using the __git add__ command .
+
+   * use __git commit__ command , it will generate a commit message indicating the merge was successfull .
+
+   * use __git push__ now , because you have resolved the conflicts now .
+
+
+__NOTE :__ In most of the cases we should not get conflicts when we are executing the commmand __git pull__ from the main branch , if conflict comes that means we are directly working on the main branch and doing the commits on that , we should not do like that , we should not disturb the main branch !!
+
+
+## Git merge and Git rebase :
+
+
+__Merge__ and __REBASE__  both are used to integrate the changes from one branch to another branch but in a different way. __It is an alternative to Pull Requests__
 
    * __git merge__ :
 
       * It preserves the non linear history of the commits and the new commit is added. 
 
       __NOTE :__ "merge" is very recommended whenever you are working on a branch on which multiple engineers are contributing it . 
+
+      In the below example , suppose you are working on the feature branch and you have done multiple commits in the feature branch and parallely master is also getting updated by the peer developers . Now you want to test your functionality with all the changes that the developers have pushed into the master branch . In that case use __git merge master__  
+      
+      Execute the below commands :
+
+         * git checkout master
+         * git pull master
+         * git checkout feature
+         * git merge master
+      In that case use __git merge master__ 
 
         * ![alt text](image-14.png)
 
@@ -214,3 +256,5 @@ merge and integrate both are used to integrate the changes from one branch to an
       __NOTE:__  __NEVER-EVER run the rebase command from the main/master branch__ , It will messup the commit history of the developers that they already commited into the main/master branch .
 
       __NOTE:__ Always use git rebase on a branch where you are working it and no-one else is contributing to it .
+
+      
