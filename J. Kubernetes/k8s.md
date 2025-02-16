@@ -1497,4 +1497,6 @@ __NOTE:__ It will generate the Load Balancer DNS of Ingress Controller, __now ma
 
     * ![alt text](image-22.png)
 
+__NOTE:__ Run the below command to delete the K8's Cluster:
 
+  * __$ eksctl delete cluster --name Kubernetes-Cluster --region ap-south-1__
