@@ -536,49 +536,6 @@ Yes it's possible to run multiple containers on the same host machine , because 
 
    * http :public-ip :8000/ 
 
-## How to dockerize the React application ??
-
-*   __Step 1: Clone the git repo.__
-
-    * $ git clone https://github.com/ashokitschool/python-flask-docker-app.git
-    
-
-* __Step 2 : Go inside the project Directory.__
-
-   * $ cd python-flask-docker-app
-
-* __Step 3: Create Dockerfile.__
-
-   *  $ vi Dockerfile (It's already there in the cloned project , but we an create as well)
-
-      * FROM python:3.6
-      * MAINTAINER Ashok Bollepalli "ashokitschool@gmail.com"
-      * COPY . /app
-      * WORKDIR /app
-      * EXPOSE 5000
-      * RUN pip install -r requirements.txt
-      * ENTRYPOINT ["python", "app.py"]
-
-* __Step 4: Build the docker image.__
-
-    * $ docker build -t python-app .
-
-* __Step 5 :Check the docker image created or not.__
-
-   * $ docker images
-
-* __Step 6 : Run the docker image__
-
-   * $ docker run -p 8000:5000 -d python-app
-
-* __Step 7 : Check Docker container and its logs.__
-
-   * docker ps
-   * docker logs `<container-id>`
-
-* __Step 8: Enable 8000 port in EC2 VM security group inbound rules & access the application in web browser.__
-
-   * http :public-ip :8000/ 
 
 ## How to dockerize the React/Angular application ??
 
@@ -863,6 +820,8 @@ __NOTE :__ Port Mapping of the database container is not required , because data
       * $ curl -fsSL https://get.docker.com -o get-docker.sh
       * $ sudo sh get-docker.sh
 
+   
+
     __NOTE :__ Enable 2377 port in security group for Swarm Cluster Communications.
 
     * __Connect to Master Machine and execute below command:__
@@ -913,7 +872,7 @@ __NOTE :__ Port Mapping of the database container is not required , because data
 
 * __NOTE :__ The main disadvantage of using the Docker-Swarm is that we cannot scale up or scale down the containers , but this is possible via different Orchestration tools like __K8's & Open-Shift__
 
-* __NOTE :__ In real time ,for every environment (one cluster will be available)
+* __NOTE :__ __In real time ,for every environment (one cluster will be available)__
 
 
 
