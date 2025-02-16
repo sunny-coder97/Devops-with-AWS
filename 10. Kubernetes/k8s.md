@@ -27,8 +27,8 @@
 
 * K8's will follow the Cluster Architecture (Group of Servers)
 
-   * Master Node (Control Plane)
-   * Worker Nodes 
+   * __Master Node (Control Plane)__
+   * __Worker Nodes__ 
 
 * K8's control panel will contain below components.
 
@@ -71,6 +71,8 @@
 __NOTE:__ In K8's everything will be executed as a POD. Inside POD containers will be available.
 
 * __Controller-Manager__ will monitor all K8's resources functionality .
+
+__NOTE:__ We have no control over the __Control Plane__ in the K8's Cluster , It is completely manged by __AWS.__
 
 ## K8's Cluster -Setup :
 
@@ -139,10 +141,10 @@ __NOTE:__ Provider Managed Clusters are chargable.
 ## What is POD ?
 
 * POD is a smallest building block that we can deploy in K8's cluster 
-* Our application will be deployed inn K8s cluster as a POD .
+* Our application will be deployed in K8s cluster as a POD .
 * For one application we can create multiple POD replicas for high availability.
 * For every POD , one IP address will be generated.
-* If POD got damaged/crash then K8's will replace it (SELF-HEALING)
+* If POD got damaged/crash then K8's will replace it __(SELF-HEALING)__
 * To create PODS , we will use __MANIFEST YML Files__
 
 __NOTE :__ By Default , PODS are accessible only with-in the cluster , we cannot access the POD's outside the cluster .
@@ -608,7 +610,7 @@ metadata:
 spec:
  replicas: 2
  selector:
-   app: javawebapp
+   app: javawebapp   //It also should be same as the POD label , To maintain specific POD count
  template:
   metadata:
    name: javawebapppod
@@ -628,7 +630,7 @@ metadata:
 spec:
  type: LoadBalancer
  selector:
-  app: javawebapp
+  app: javawebapp   //It should be same as the POD label , To expose the specific POD 
  ports:
   - port: 80
     targetPort: 8080
@@ -690,7 +692,6 @@ apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
  name: javawebrs
-
 spec:
  replicas: 2
  selector:
@@ -842,24 +843,34 @@ spec:
 
 * __Below are the steps to deploy the application in the K8's Cluster using Blue-Green Deployment model.__
 
-  * __Step 1:__ Clone the below Git Repository :
+  * __Step 1:__ Clone the below Git Repository and go into __02-Blue-Green-Model Folder:__
      
      * https://github.com/ashokitschool/kubernetes_manifest_yml_files.git
 
   * __Step 2:__ Create __BLUE__ Deployment __PODS__ 
+
+     __NOTE__: I have changed the service type from __LoadBalancer__ to __NodePort in the Live Service__, because I wanted to expose the __blue PODS using NodePort Service.__
 
   * __Step 3:__ Create __Live Service__  to expose __BLUE PODS (VERSION: V1 )__
 
     * __Live Service URL :__ http://node-ip:30785/java-web-app/
 
   * __Step 4: Modify the code in GIT Repo + Build Project + Build Docker Image + Push Docker Image to Docker Hub__ 
-
+  
+    * Here , the docker image that we used in the blue PODS , same docker image we are using in the __green PODS__ but before that , We are doing the code changes in the project , We are building it again , We are creating the docker image again and pushing the same image on the Docker-Hub ,So that It can be pulled in the __Green PODS.__ 
+    
   * __Step 5:__ Create __GREEN__ Deployment __PODS__
 
   * __Step 6:__ Create __Pre-Prod Service__ to expose the __GREEN PODS (VERSION: V2)__
 
      * __Pre-Prod Service URL :__ http://node-ip:31785/java-web-app/
 
+  * 
+      <mark>
+      Change the selector in the Live-Service URL to access the green PODS.
+
+      </mark>
+ 
 ## Config Map & Secrets :
 
 * Every application will have several environments for testing purpose .
@@ -1038,10 +1049,14 @@ __Below are the steps to deploy the application in the K8's Cluster.__
 
 * __NOTE:__ Check app pod running in which worker node then enable node-port number in security group in-bound rules and access the application. 
 
+* __NOTE:__ __In the real time scenarios , We don't deploy the database in the K8's Cluster.__ 
+
 <mark>
-Database POD is exposed as a service , With that service name Application POD can access the database . In the Docker , network is used to communicate from one container to another container . Here both containers are running in the PODS and both PODS are running in the same cluster , so directly by using the service name it can access .
+Database POD is exposed as a Service , With that Service name Application POD can access the database . In the Docker , network is used to communicate from one container to another container . Here both containers are running in the PODS and both PODS are running in the same cluster , so directly by using the service name it can access .
  
 </mark>
+
+
 
 ## Logs-Monitoring :
 
@@ -1057,13 +1072,15 @@ __NOTE :__ If we have 1 or 2 PODS then easily we can check logs , What if we hav
 
 * To overcome this problem , __We will setup Log-Aggregation in the K8's Cluster using EFK Stack.__
 
-## What is EFK Stack ?
+## What is EFK Stack (Log-Monitoring Stack)?
 
 * It is a collection of three open source products : __Elasticsearch, Fluentd and Kibana.__
 
 * __EFK Stack__ provides __centralized logging__ in order to identify problems with servers or applications .
 
 * It allows you to search the logs in a single place .
+
+* __EFK Setup__ is nothing , but to install these softwares in the K8's Cluster.
 
 * ![alt text](image-12.png)
   
@@ -1074,27 +1091,410 @@ __NOTE :__ If we have 1 or 2 PODS then easily we can check logs , What if we hav
 * __StatefulSet :__ It is used to create __PODS__ with Stateful Behaviour. 
 * __DaemonSet :__ It is used to create the __POD__ in each Worker Node. 
 
-  * __Kibana__ will be executed as a __Deployment.__
-  * __Elastic-Search__ will be executed as a __StatefulSet.__
-  * __FluentD__ will be excuted as a __DaemonSet.__ 
+  * __Kibana__:  It is used to __display the logs__ & will be executed as a __Deployment.__
+  * __Elastic-Search__: It is used to __store the logs__ & will be executed as a __StatefulSet.__ 
+  * __FluentD__ : It is used to __collect the logs__ & will be excuted as a __DaemonSet.__
   
 * <mark>
    For all the Team members , Production Env. Cluster access won't be available , but Non-Prod Env. Cluster access will be available.
   </mark>
 * __Below are the steps to setup the EFK Stack in the K8's Cluster :__
 
-  * Deploy one application using Deployment Manifest.
+  * Deploy one application using Deployment Manifest & expose it using LoadBalancer Service.
 
-     * Application Docker Image : ashokit/sb-logger-app
+     * __Application Docker Image :__ ashokit/sb-logger-app
 
-  * Expose application using K8's Service (LBR).
+```yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: javawebappdeployment
+spec:
+ replicas: 2
+ strategy: 
+  type: RollingUpdate
+ selector:
+  matchLabels:
+   app: javawebapp
+ template:
+  metadata:
+   name: javawebapppod
+   labels:
+    app: javawebapp
+  spec:
+   containers:
+   - name: javawebappcontainer
+     image: ashokit/sb-logger-app
+     ports:
+     - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: javawebappsvc
+spec:
+ type: LoadBalancer
+ selector:
+  app: javawebapp
+ ports:
+  - port: 80
+    targetPort: 8080
+...
+```
+  * Do the git clone https://github.com/ashokitschool/kubernetes_manifest_yml_files.git and go into __04-EFK-Log Folder and apply the yaml's in the below order.__
+
+  ![alt text](image-18.png)
 
   * Deploy __ElasticSearch PODS__ using __StatefulSet.__
 
   * Deploy __FluentD PODS__ using DaemonSet.
 
-  * Deploy __Kibana__ and expose as __LBR Service.__ 
+  * Deploy __Kibana__ and expose as __LBR Service__  & enable __5601 in Kibana LBR security.__
 
-  * Access __Kibana dashboard__ and setup index pattern to get logs. 
+  
+  * Namespace named __efklog__  has been created with all the resources , we can check all the resources with the below command .
+
+     * __$ kubectl get all -n efklog__
+
+  __NOTE:__ Two Load Balancers would be created , One is application __Load-Balancer__ & other is __Kibana Load-Balancer.__ 
+
+  * Access __Kibana dashboard__ and setup __index pattern__ to see the logs. 
 
   * Access __application logs in kibana dashboard.__ 
+
+## What are Helm Charts in K8's:
+
+* HELM is a package manager for K8's Cluster .
+
+* HELM is used to install required softwares in the K8's Cluster like __Metrics Server , Prometheus and Grafana.__ 
+
+* HELM will maintain Charts in the Chart Repository.
+
+* Chart means collection of configuration files [YML Files] , __by combining all the YML files one chart will be created.__
+
+
+
+* __Helm Installation Steps:__
+  * $ curl -fsSl -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+
+  * $ chmod 700 get_helm.sh
+
+  * $ ./get_helm.sh
+
+  * $ helm
+
+  * __Check helm repos.__
+
+    * $ helm repo ls
+
+  __Metrics-Server:__ It is used to check top PODS and top Nodes. , What is the memory consuming by each POD , utilization of the CPU by each worker node , that information we can get by Metrics Server.
+
+
+  __NOTE:__ By default __"Metrics-Server"__ is not available in the K8's cluster. We can install metrics-server by using the __HELM Chart or by manually applying the YML Files.__
+  
+  * __Add the metrics-server to Helm Repository:__
+  
+    * $ helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+    
+  * __Install the Metrics Server.__
+      * $ helm upgrade --install metrics-server metrics-server/metrics-server
+
+
+
+## K8's Monitoring tools : Prometheus & Grafana 
+
+* We can monitor our K8's cluster and cluster components using below softwares.
+
+  * __Prometheus__
+  * __Grafana__
+
+* __Prometheus :__
+
+  * __Prometheus__ is an open source , system monitoring and alerting toolkit .
+
+  * __Prometheus__ collects and stores its metrics as a __time series data.__
+
+  * It provides out of the box monitoring capabilities for the K8's container orchestration platform .
+
+* __Grafana :__
+
+  * __Grafana__ is an analysis and monitoring tool .
+  * __Grafana__ is a multi platform open source analytics and interactive visualization web application.
+  * __Grafana__ allows you to query , visulaize , alert on and understand your metrics no matter where they are stored . It creates , explores and share dashboards .
+
+__NOTE :__ Grafana can connect with both __Prometheus (Time Series Data) and Loki (Logs Data).__
+
+__NOTE:__ __Prometheus__ will monitor the cluster , will get the data from the cluster and will give that data to the __Grafana.__ We can login into the Grafana and manage all the K8's resources in Graphical Format .
+
+* __Install Prometheus and Grafana in K8's cluster using HELM Chart.__
+
+  * Using HELM Charts , we can easily deploy __Prometheus and Grafana as a POD in the Cluster__ and we can expose them as a __LoadBalancer Service.__
+  
+  * Add the latest helm repository in Kubernetes
+    * __$ helm repo add stable https://charts.helm.sh/stable__
+    
+  * Add prometheus repo to helm
+    * __$ helm repo add prometheus-community https://prometheus-community.github.io/helm-charts__
+    
+  * Update Helm Repo
+    * __$ helm repo update__
+    
+  * Install prometheus
+    * __$ helm install stable prometheus-community/kube-prometheus-stack__
+    
+  * Get all pods 
+  
+    * __$ kubectl get pods__
+    
+  * Get all Services
+    * __$ kubectl get svc__
+
+__NOTE:__ All the PODS related to __Grafana & Prometheus__ will be created in the K8's Cluster.
+
+* By default prometheus and grafana services are available within the cluster as ClusterIP, to access them outside lets change it to LoadBalancer.
+
+* Edit Prometheus Service & change service type to LoadBalancer then save and close that file
+   * __$ kubectl edit svc stable-kube-prometheus-sta-prometheus__
+
+* Now edit the grafana service & change service type to LoadBalancer then save and close that file
+  * __$ kubectl edit svc stable-grafana__
+
+* Verify the service if changed to LoadBalancer
+   * __$ kubectl get svc__
+
+* Access Promethues server using below URL
+
+    __URL : http://LBR-DNS:9090/__
+
+* Access Grafana server using below URL
+
+   __URL : http://LBR-DNS/__
+
+* Use below credentials to login into grafana server
+
+  * __UserName:__ admin
+  * __Password:__ prom-operator
+
+* Once we login into Grafana then we can monitor our k8s cluster. Grafana will provide all the data in charts format.
+
+## Autoscaling in Kubernetes :
+
+* It is the process of increasing / decreasing infrastructure resources based on demand.
+
+* Autoscaling can be done in 2 ways.
+
+  * __Horizontal Scaling__ : It means increasing number of instances/servers/PODS
+  * __Vertical Scaling__ : It means increasing capacity of single system.
+
+__NOTE:__ Nodes are by-default __Autoscalable__. __PODS__ count can increase , __Worker Nodes__ count can increase , but __Control Plane__ count cannot increase in the Cluster .
+
+* __HPA (Horizontal POD AutoScaling)__
+
+  * It is used to scale up or scale down the number of POD replica's based on the observed metrics .
+
+  * HPA will interact with "Metrics-Server" to identify CPU/Memory utilization of the POD.
+
+  * Metrics-Server is an application that collect metrics from objects such as __PODS, Nodes__ according to the state of CPU, RAM and keeps them in time.
+
+     * ![alt text](image-19.png)
+
+* Below are the steps to monitor the Auto-Scaling in the K8's Cluster :
+
+  * __Step 1: Install Metrics Server:__
+
+    * clone git repo
+ 
+       * $ git clone https://github.com/ashokitschool/k8s_metrics_server
+
+     * check the cloned repo
+
+       * $ cd k8s_metrics_server
+
+        * $ ls deploy/1.8+/
+
+     * Apply manifest files from manifest-server directory
+       * $ kubectl apply -f deploy/1.8+/
+       
+     * We can see metric server running in kube-system ns
+       * $ kubectl get all -n kube-system
+
+     * Check the top nodes using metric server
+       * $ kubectl top nodes
+
+     * Check the top pods using metric server
+        * $ kubectl top pods
+
+  * __Step 2: Deploy some sample application , expose it via Service & deploy the Horizontal POD Autoscaler (HPA):__
+
+    * Clone git repo and go to __05-HPA__ folder and execute all the YML Files  to deploy the HPA in the Cluster :
+
+      * $ git clone https://github.com/ashokitschool/kubernetes_manifest_yml_files
+
+  * __Step 3: Increase the load in the Cluster:__
+
+    * $ kubectl get hpa
+
+    * $ kubectl run -i --tty load-generator --rm --image=busybox --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://hpa-demo-deployment; done"
+
+    __NOTE:__ After executing load generator open new git bash and connect to eks vost vm and monitor hpa with below commands
+
+     * $ kubectl get hpa -w
+
+     * $ kubectl describe deploy hpa-demo-deployment
+
+     * $ kubectl get hpa
+
+     * $ kubectl get events
+
+     * $ kubectl top pods 
+
+     * $ kubectl get hpa
+
+## What is the difference between Load Balancer & API Gateway ?
+
+  * __Load Balancer :__ Load Balancer Job is to manage the traffic between multiple instances of the same service . So if microservice 'A' is running on multiple machines 1,2 & 3 then L.B will make sure that 1,2, and 3 are not overloaded and it manages the traffic between the multiple instances of the same service .
+
+  * __API-Gateway :__ API Gateway can manage the traffic between multiple microservices. It can see if a request is coming , It will be fulfilled by which microservice , It takes care of routing , security , rate limiting and lot of other things.
+
+
+## Ingress-Controller :
+
+ __NOTE:__  There are many challenges with the __NodePort & Load Balancer__ service to expose the PODS to the external world , that's why in industry , Ingress is very popular . 
+
+* It is used to route external requests to K8s services.
+
+* It will act as a __Front Controller.__
+
+* We will configure Routing Rules in Ingress Controller ,  based on rules Ingress Controller will identify which request should be routed to which service in K8's Cluster .
+
+* It acts as a mediator between Incoming Requests & K8's Services.
+
+    ![alt text](image-21.png)
+
+
+
+* deploy __javawebapp.yml__ & __mavenwebapp.yml__ in the cluster with the below code .
+
+ ```yaml
+ ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: javawebappdeployment
+spec:
+ replicas: 1
+ strategy:
+  type: RollingUpdate
+ selector:
+  matchLabels:
+   app: javawebapp
+ template:
+  metadata:
+   name: javawebapppod
+   labels:
+    app: javawebapp
+  spec:
+   containers:
+   - name: javawebappcontainer
+     image: ashokit/javawebapp
+     ports:
+     - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: javawebappsvc
+spec:
+ type: ClusterIP
+ selector:
+  app: javawebapp
+ ports:
+  - port: 80
+    targetPort: 8080
+...
+```
+```yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: mavenwebappdeployment
+spec:
+ replicas: 1
+ strategy:
+    type: Recreate
+ selector:
+   matchLabels:
+     app: mavenwebapp
+ template:
+  metadata:
+   name: mavenwebapppod
+   labels:
+     app: mavenwebapp
+  spec:
+    containers:
+    - name: mavenwebappcontainer
+      image: ashokit/mavenwebapp
+      imagePullPolicy: Always
+      ports:
+      - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: mavenwebappsvc
+spec:
+  type: ClusterIP
+  selector:
+   app: mavenwebapp
+  ports:
+   - port: 80
+     targetPort: 8080
+...
+```
+
+* Setup the Ingress in the K8's Cluster :
+
+  * __Do the Git Clone of the below repo :__
+
+    * https://github.com/ashokitschool/kubernetes_ingress.git
+
+  * __$ cd kubernetes-ingress__
+
+  * __Create namespace and service-account__
+  
+     * $ kubectl apply -f common/ns-and-sa.yaml
+
+  * __Create RBAC & ConfigMap__
+
+     * $ kubectl apply -f common/
+
+  * __Deploy Ingress Controller :__
+
+    *  We have two ways to deploy the ingress controller.
+       
+       * Deployment
+       * DaemonSet
+
+         * $ kubectl apply -f daemon-set/nginx-ingress.yaml
+
+  * __Get Ingress PODS using namespace :__
+
+    * $ kubectl get all -n nginx-ingress
+
+  * __Create Load-Balancer service to expose the Ingress-Controller POD.__
+
+    * $ kubectl apply -f service/loadbalancer-aws-elb.yaml
+
+__NOTE:__ It will generate the Load Balancer DNS of Ingress Controller, __now map loadbalancer DNS to route 53 domain.__
+
+* ![alt text](image-23.png)
+
+  * Now do the Path based Routing on the basis of Ingress Rules which are written in __ingress-rules.yml__
+
+    * __$ kubectl apply -f ingress-rules.yml__
+
+    * ![alt text](image-22.png)
+
+
