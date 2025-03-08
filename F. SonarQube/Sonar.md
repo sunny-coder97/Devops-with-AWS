@@ -42,7 +42,7 @@
 
 * Take t2.medium instance in AWS EC2 service.
 
-* Java Software is required to install Nexus 
+* Java Software is required to install SonarQube. 
 
 * Connect to t2.medium instance using Mobaxterm.
 
@@ -88,7 +88,7 @@
  
 * __Switch to sonar user__
 
-   * $ su - sunar 
+   * $ su - sonar 
 
 * __Go to sonar bin directory and then go to linux directory and run the sonar server .__
 
@@ -114,6 +114,8 @@
      * __URL :__ http ://EC2-VM-IP:9000
 
 * Default Credentials of Sonar user is __admin__ & __admin__
+
+__NOTE:__ <mark>__When we shut down the EC2 machine in which Sonar Server is running , next time the IP of the machine will change & you have to login as a Sonar User to start the Sonar Server again.__</mark>
 
 ## Integrate Sonar server with Java Maven App
 

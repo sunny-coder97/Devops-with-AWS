@@ -52,14 +52,15 @@
 
 * __Download tomcat server tar file.__
 
-   * 	$ wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.97/bin/apache-tomcat-9.0.97.tar.gz
+   * 	$ wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.100/bin/apache-tomcat-9.0.100.tar.gz
 
 
 * __Extract the tar file:__
 
-    * $ tar -xvf apache-tomcat-9.0.97.tar.gz
+    * $ tar -xvf apache-tomcat-9.0.100.tar.gz
+
 	
-    * $ cd apache-tomcat-9.0.97
+    * $ cd apache-tomcat-9.0.100
     
     * $ ls -lrt (below is the directory structure of the tomcat folder )
 
